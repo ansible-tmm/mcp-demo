@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "aap-mcp-job-management": {
+      "type": "streamable-http",
+      "url": "https://YOUR-AAP-SERVER:8448/job_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    },
+    "aap-mcp-inventory-management": {
+      "type": "streamable-http",
+      "url": "https://YOUR-AAP-SERVER:8448/inventory_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    },
+    "aap-mcp-system-monitoring": {
+      "type": "streamable-http",
+      "url": "https://YOUR-AAP-SERVER:8448/system_monitoring/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    },
+    "aap-mcp-user-management": {
+      "type": "streamable-http",
+      "url": "https://YOUR-AAP-SERVER:8448/user_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    },
+    "aap-mcp-security-compliance": {
+      "type": "streamable-http",
+      "url": "https://YOUR-AAP-SERVER:8448/security_compliance/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    },
+    "aap-mcp-platform-configuration": {
+      "type": "streamable-http",
+      "url": "https://YOUR-AAP-SERVER:8448/platform_configuration/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    }
+  }
+}

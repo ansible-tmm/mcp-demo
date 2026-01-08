@@ -1,1 +1,4 @@
 mcp_key.txt
+.env
+sean-config-template.json
+*.pem
