@@ -141,6 +141,16 @@ If you get `net::ERR_CERT_AUTHORITY_INVALID` errors:
 2. Launch Cursor from terminal: `open -a Cursor`
 3. Verify with: `echo $NODE_TLS_REJECT_UNAUTHORIZED` (should show `0`)
 
+### Why streamable-http Transport?
+
+This repo uses `type: "streamable-http"` instead of plain `"http"` because:
+- AAP MCP servers use a session-based protocol
+- `streamable-http` handles Server-Sent Events (SSE) and streaming responses
+- Falls back to SSE automatically if needed
+- More reliable for AAP's MCP implementation
+
+For more details, see [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+
 ### Connection Issues
 
 1. **Verify AAP MCP server is running** on your AAP instance

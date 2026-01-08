@@ -1,70 +1,120 @@
 # Known Issues and Status
 
-## Current Status: ⚠️ Partially Working
+## Current Status: ✅ Working (with workarounds)
 
-As of January 8, 2026, there are compatibility issues between Cursor's MCP transport and the Ansible Automation Platform MCP server.
+As of January 8, 2026, AAP MCP servers work with Cursor using the configuration in this repo.
 
-### Issue 1: Self-Signed Certificate Errors
+## Issue 1: Self-Signed Certificate Errors ✅ SOLVED
 
 **Problem**: `net::ERR_CERT_AUTHORITY_INVALID` errors when connecting to AAP servers with self-signed certificates.
 
-**Solution**: Set environment variable before launching Cursor:
+**✅ Solution**: Set environment variable before launching Cursor:
+
 ```bash
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 open -a Cursor
 ```
 
-See README for permanent setup instructions.
+See [README](README.md#2-set-environment-variables) for permanent setup instructions.
 
-### Issue 2: Session-Based Protocol
+**Status**: ✅ Working
 
-**Problem**: The AAP MCP server responds with:
+## Issue 2: Tool Name Length Warnings ⚠️ WORKAROUND AVAILABLE
+
+**Problem**: Some tool names are very long. When combined with long server names like `aap-mcp-job-management` (23 chars), they exceed Cursor's 60-character limit.
+
+**⚠️ Solution**: Use shorter server names in your `mcp.json`:
+- `aap-job` instead of `aap-mcp-job-management`
+- `aap-inv` instead of `aap-mcp-inventory-management`
+- etc.
+
+See [TOOL_NAME_LIMITS.md](TOOL_NAME_LIMITS.md) for detailed analysis and recommendations.
+
+**Status**: ⚠️ Workaround available (use short names)
+
+## Issue 3: Transport Protocol ✅ SOLVED
+
+**Problem**: Initial testing with plain `http` transport showed session-based protocol issues.
+
+**✅ Solution**: Use `streamable-http` transport type instead of plain `http`:
+
 ```json
-{"jsonrpc":"2.0","error":{"code":-32000,"message":"Bad Request: No valid session ID provided"},"id":null}
+{
+  "mcpServers": {
+    "aap-job": {
+      "type": "streamable-http",  // ← Use this instead of "http"
+      "url": "https://your-aap-server.com:8448/job_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    }
+  }
+}
 ```
 
-This indicates the server uses a **session-based protocol** that Cursor's HTTP MCP client may not fully support yet.
+**What is streamable-http?**
+- Enhanced HTTP transport that handles streaming responses
+- Better suited for MCP servers that use Server-Sent Events (SSE) style communication
+- Falls back to SSE transport if needed
+- Works better with AAP's session-based MCP implementation
 
-### What We've Verified
+**Status**: ✅ Working with `streamable-http`
+
+## What's Working
 
 ✅ AAP server is accessible
-✅ API token authenticates successfully
-✅ `/api/mcp/` endpoint exists and responds
-✅ Server accepts POST requests
+✅ API token authentication works
+✅ All 6 MCP server endpoints connect successfully
 ✅ SSL certificate bypass works with environment variable
-❌ Session ID handling may not work with Cursor's HTTP transport (still being investigated)
+✅ `streamable-http` transport handles AAP's MCP protocol
+✅ Tools are accessible from Cursor AI chat
 
-### Possible Solutions
+## Recommendations
 
-1. **Use Environment Variable for SSL**: `NODE_TLS_REJECT_UNAUTHORIZED=0` (working solution)
+### For Best Results:
 
-2. **Wait for Cursor Updates**: Cursor may need to add session support to their HTTP MCP client
+1. **Use `streamable-http` transport** (not plain `http`)
+2. **Use short server names** (7 chars or less) to avoid tool name length issues
+3. **Set `NODE_TLS_REJECT_UNAUTHORIZED=0`** for self-signed certificates
+4. **Launch Cursor from terminal** to ensure environment variables are loaded
 
-3. **Wait for AAP Updates**: AAP may add sessionless HTTP transport support
+### Example Working Configuration:
 
-4. **Use Alternative Transport**: If AAP adds SSE or stdio transport for MCP, those may work better with Cursor
+```json
+{
+  "mcpServers": {
+    "aap-job": {
+      "type": "streamable-http",
+      "url": "https://172.16.14.100:8448/job_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    }
+  }
+}
+```
 
-5. **Use Different MCP Client**: Try with Claude Desktop or other MCP-compatible clients that may have better session support
-
-### Test Commands
+## Test Commands
 
 Verify your server setup:
 
 ```bash
 # Test server accessibility
-curl -k -I https://aap-nostromo.demoredhat.com:8448/
+curl -k -I https://your-aap-server.com:8448/
 
-# Test MCP endpoint
+# Test MCP endpoint (may show session error, but endpoint is working)
 curl -k -X POST \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","method":"initialize","params":{},"id":1}' \
-  https://your-aap-server.com:8448/api/mcp/
+  https://your-aap-server.com:8448/job_management/mcp
 ```
 
-### Contributing
+Note: You may see a session ID error from curl, but that's expected. Cursor's `streamable-http` transport handles this correctly.
 
-If you find a working configuration, please contribute! This is an emerging integration and we're documenting what works (and what doesn't) as we discover it.
+## Contributing
+
+If you discover additional optimizations or issues, please contribute! This is an emerging integration.
 
 ## Last Updated
 
