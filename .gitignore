@@ -1,5 +1,4 @@
 mcp_key.txt
 .env
-admin-config-template.json
-no-priv-mcp-config-template.json
 *.pem
+no-priv-mcp-config-template.json
