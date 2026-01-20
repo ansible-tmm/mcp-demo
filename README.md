@@ -6,6 +6,8 @@ This repository demonstrates how to connect Cursor AI to Ansible Automation Plat
 
 AAP provides **one MCP server** with **6 separate toolset endpoints** that enable Cursor to interact with different aspects of your automation platform:
 
+![logical diagram for aap and mcp](images/diagram.png)
+
 1. **Job Management** - Execute and monitor automation jobs
 2. **Inventory Management** - Manage hosts, groups, and inventories
 3. **System Monitoring** - Monitor platform health and metrics
@@ -15,17 +17,31 @@ AAP provides **one MCP server** with **6 separate toolset endpoints** that enabl
 
 Each toolset provides specific capabilities through its own endpoint path on the single MCP server.
 
+## About This Repository
+
+**This repository focuses on configuring and connecting Cursor AI (or other MCP-compatible applications) to an already-deployed AAP MCP server.** If you need to deploy the MCP server itself, please refer to the deployment guides below.
+
+## Deploying the AAP MCP Server
+
+Before using this configuration guide, you need to deploy the AAP MCP server on your infrastructure:
+
+- **Deploy on RHEL**: [red.ht/mcp_rhel](https://red.ht/mcp_rhel)
+- **Deploy on OpenShift**: [red.ht/mcp_openshift](https://red.ht/mcp_openshift)
+- **GitHub Repository** (for issues, collaboration, RFEs): [red.ht/aap-mcp](https://red.ht/aap-mcp)
+
+Once your MCP server is deployed, return here to configure your Cursor IDE or other MCP-compatible client applications.
+
 ## Prerequisites
 
-- Ansible Automation Platform 2.6+ with MCP server deployed
-- Cursor IDE
+- Ansible Automation Platform 2.6+ with MCP server deployed (see deployment guides above)
+- Cursor IDE or other MCP-compatible application
 - API token from your Ansible Automation Platform
 
 ## Quick Start
 
 ### 1. Get Your AAP API Token
 
-Follow the [Red Hat documentation](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/latest/html/containerized_installation/deploying-ansible-mcp-server#proc-create-api-token-ansible-mcp-server_deploying-ansible-mcp-server) to create an API token.
+Follow the <a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/latest/html/containerized_installation/deploying-ansible-mcp-server#proc-create-api-token-ansible-mcp-server_deploying-ansible-mcp-server" target="_blank" rel="noopener noreferrer">Red Hat documentation</a> to create an API token.
 
 Save your token in `mcp_key.txt` (gitignored for security).
 
@@ -122,8 +138,8 @@ Without Cursor Rules, the AI might inefficiently query every host. With the rule
 
 ### Learn More
 
-- [Cursor Rules Documentation](https://docs.cursor.com/context/rules-for-ai) - Official guide on creating and using `.cursorrules`
-- [Example Cursor Rules](https://github.com/PatrickJS/awesome-cursorrules) - Community examples for different domains
+- <a href="https://docs.cursor.com/context/rules-for-ai" target="_blank" rel="noopener noreferrer">Cursor Rules Documentation</a> - Official guide on creating and using `.cursorrules`
+- <a href="https://github.com/PatrickJS/awesome-cursorrules" target="_blank" rel="noopener noreferrer">Example Cursor Rules</a> - Community examples for different domains
 
 The `.cursorrules` file in this repo can serve as a template for your own AAP-specific AI context!
 
@@ -143,9 +159,11 @@ Once connected, interact with AAP using natural language:
 
 Watch this video walkthrough demonstrating real-world examples of what you can do with the MCP server for Ansible Automation Platform:
 
-[![5 Use-cases with Ansible Automation Platform MCP Server](https://img.youtube.com/vi/h6VboweM8Ww/maxresdefault.jpg)](https://youtu.be/h6VboweM8Ww?si=65ZZuxwHGjbBtjku)
+<a href="https://youtu.be/h6VboweM8Ww?si=65ZZuxwHGjbBtjku" target="_blank" rel="noopener noreferrer">
+  <img src="https://img.youtube.com/vi/h6VboweM8Ww/maxresdefault.jpg" alt="5 Use-cases with Ansible Automation Platform MCP Server" />
+</a>
 
-[Watch on YouTube →](https://youtu.be/h6VboweM8Ww?si=65ZZuxwHGjbBtjku)
+<a href="https://youtu.be/h6VboweM8Ww?si=65ZZuxwHGjbBtjku" target="_blank" rel="noopener noreferrer">Watch on YouTube →</a>
 
 ## MCP Server Endpoint Toolsets
 
@@ -232,9 +250,15 @@ mcp-demo/
 
 ## Additional Resources
 
-- [Red Hat AAP MCP Server Documentation](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/containerized_installation/deploying-ansible-mcp-server)
-- [Configure MCP in Cursor](https://docs.cursor.com/context/model-context-protocol)
-- [Model Context Protocol Specification](https://modelcontextprotocol.io/)
+### AAP MCP Server Deployment
+- **Deploy on RHEL**: [red.ht/mcp_rhel](https://red.ht/mcp_rhel)
+- **Deploy on OpenShift**: [red.ht/mcp_openshift](https://red.ht/mcp_openshift)
+- **Official GitHub Repository**: [red.ht/aap-mcp](https://red.ht/aap-mcp)
+
+### Documentation
+- <a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/containerized_installation/deploying-ansible-mcp-server" target="_blank" rel="noopener noreferrer">Red Hat AAP MCP Server Documentation</a>
+- <a href="https://docs.cursor.com/context/model-context-protocol" target="_blank" rel="noopener noreferrer">Configure MCP in Cursor</a>
+- <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">Model Context Protocol Specification</a>
 - [Tool Name Limits Analysis](TOOL_NAME_LIMITS.md) - Important for avoiding naming errors
 
 ## License
