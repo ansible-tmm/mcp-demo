@@ -1,0 +1,67 @@
+# Ansible Automation Platform (AAP) Context
+
+## Inventory Organization Best Practices
+
+### Use Groups for Sorting and Filtering
+- AAP inventories organize hosts into **groups** for easier management
+- Common groups include: `os_windows`, `os_linux`, `os_rhel`, `os_amazon`, etc.
+- When querying hosts by OS or other criteria, **always check inventory groups first**
+- Use `groups_list` to find relevant groups within an inventory
+- Query hosts within specific groups rather than filtering all hosts manually
+
+### Example Workflow for OS-Based Queries:
+1. List inventory groups: `groups_list` with inventory context
+2. Identify relevant group (e.g., `os_windows` for Windows hosts)
+3. Query hosts within that specific group for accurate counts/details
+
+## Host Variables for OS Detection
+
+### Using Host Variables (host.variables)
+- Each host has a `variables` field containing important metadata
+- Common OS-related variables:
+  - `ansible_facts.os_family` (e.g., "Windows", "RedHat", "Debian")
+  - `ansible_facts.distribution` (e.g., "Ubuntu", "CentOS", "Amazon")
+  - `ansible_facts.system` (e.g., "Linux", "Win32NT")
+  - `os` or `operating_system` (custom variables)
+- Variables are stored as JSON strings and need to be parsed
+
+### Host Variable Parsing Strategy:
+- Use `hosts_list` to retrieve host details including variables
+- Parse the `variables` field (usually JSON) to extract OS information
+- Look for ansible_facts first, then fall back to custom variables
+
+## AAP API Patterns
+
+### Pagination
+- Default page size: typically 50-200 results
+- Always check the `count` field for total items
+- Use `page` and `page_size` parameters to retrieve all results
+- If count > page_size, iterate through all pages
+
+### Resource Relationships
+- Inventories contain Groups and Hosts
+- Groups contain Hosts
+- Hosts belong to one Inventory and zero or more Groups
+- Use group membership for efficient filtering
+
+## Query Strategy for Common Tasks
+
+### "How many Windows hosts?"
+1. Use `groups_list` to find the `os_windows` group
+2. Get the group details which includes host count
+3. Or query `hosts_list` filtered to that group
+
+### "List all hosts by OS"
+1. List all groups to identify OS-based groups
+2. Query each group for its hosts
+3. Alternatively, retrieve all hosts and parse their `variables` field
+
+### "What OS is host X running?"
+1. Use `hosts_retrieve` to get host details
+2. Parse the `variables` field
+3. Look for `ansible_facts.os_family` or similar fields
+
+## MCP Tool Preferences
+- Use AAP MCP tools (`mcp_aap-management_*`) over curl commands
+- Tools handle authentication and formatting automatically
+- Always check tool output for pagination hints (`next`, `previous`, `count`)

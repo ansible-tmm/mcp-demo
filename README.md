@@ -4,7 +4,7 @@ This repository demonstrates how to connect Cursor AI to Ansible Automation Plat
 
 ## Overview
 
-AAP provides **6 separate MCP servers** that enable Cursor to interact with different aspects of your automation platform:
+AAP provides **one MCP server** with **6 separate toolset endpoints** that enable Cursor to interact with different aspects of your automation platform:
 
 1. **Job Management** - Execute and monitor automation jobs
 2. **Inventory Management** - Manage hosts, groups, and inventories
@@ -13,7 +13,7 @@ AAP provides **6 separate MCP servers** that enable Cursor to interact with diff
 5. **Security & Compliance** - Access security policies and audit logs
 6. **Platform Configuration** - Configure platform settings
 
-Each server provides specific tools through its own MCP endpoint.
+Each toolset provides specific capabilities through its own endpoint path on the single MCP server.
 
 ## Prerequisites
 
@@ -34,6 +34,9 @@ Save your token in `mcp_key.txt` (gitignored for security).
 Add these to your `~/.zshrc` or `~/.bashrc`:
 
 ```bash
+# AAP Server hostname or IP
+export AAP_SERVER="your-aap-server.com"
+
 # AAP API Token
 export MY_SERVICE_TOKEN=$(cat /path/to/mcp-demo/mcp_key.txt)
 
@@ -49,9 +52,8 @@ Then run: `source ~/.zshrc`
 
 1. Open **Cursor** → **Settings** → **Cursor Settings** → **Tools & MCP**
 2. Copy content from `mcp-config-template.json`
-3. Replace `YOUR-AAP-SERVER` with your AAP server address (hostname or IP)
-4. Replace `${env:MY_SERVICE_TOKEN}` with your actual token OR keep as-is to use the environment variable
-5. Click **Save**
+3. Paste directly into Cursor's MCP configuration (the template already uses environment variables)
+4. Click **Save**
 
 **Example Configuration:**
 
@@ -60,14 +62,14 @@ Then run: `source ~/.zshrc`
   "mcpServers": {
     "aap-mcp-job-management": {
       "type": "streamable-http",
-      "url": "https://your-aap-server.com:8448/job_management/mcp",
+      "url": "https://${env:AAP_SERVER}:8448/job_management/mcp",
       "headers": {
         "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
       }
     },
     "aap-mcp-inventory-management": {
       "type": "streamable-http",
-      "url": "https://your-aap-server.com:8448/inventory_management/mcp",
+      "url": "https://${env:AAP_SERVER}:8448/inventory_management/mcp",
       "headers": {
         "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
       }
@@ -95,7 +97,35 @@ In Cursor's AI chat, try:
 What MCP tools are available for my Ansible Automation Platform?
 ```
 
-You should see tools from all 6 AAP MCP servers.
+You should see tools from all 6 AAP MCP toolset endpoints.
+
+## Cursor Rules for AAP Context
+
+This repository includes a `.cursorrules` file that provides AI context about Ansible Automation Platform best practices. Cursor Rules help the AI assistant understand your specific domain and make better decisions when interacting with AAP.
+
+### What's Included
+
+The `.cursorrules` file provides guidance on:
+- **Inventory organization** - How to query hosts using groups efficiently
+- **Host variables** - Understanding ansible_facts and custom variables
+- **API patterns** - Pagination, resource relationships, and common workflows
+- **Query strategies** - Best practices for common AAP tasks
+- **Tool preferences** - When to use MCP tools vs. direct API calls
+
+### Example Benefits
+
+Without Cursor Rules, the AI might inefficiently query every host. With the rules, it knows to:
+1. Check inventory groups first (e.g., `os_windows`, `os_linux`)
+2. Use group membership for filtering
+3. Parse host variables correctly for OS detection
+4. Handle pagination appropriately
+
+### Learn More
+
+- [Cursor Rules Documentation](https://docs.cursor.com/context/rules-for-ai) - Official guide on creating and using `.cursorrules`
+- [Example Cursor Rules](https://github.com/PatrickJS/awesome-cursorrules) - Community examples for different domains
+
+The `.cursorrules` file in this repo can serve as a template for your own AAP-specific AI context!
 
 ## Usage Examples
 
@@ -107,11 +137,21 @@ Once connected, interact with AAP using natural language:
 - `List all users in my organization`
 - `Show me recent activity in the audit log`
 
-## MCP Server Endpoints
+## Video Tutorial
 
-AAP provides these MCP server endpoints:
+🎥 **5 Use-cases with Ansible Automation Platform MCP Server**
 
-| Service | Endpoint Path | Purpose |
+Watch this video walkthrough demonstrating real-world examples of what you can do with the MCP server for Ansible Automation Platform:
+
+[![5 Use-cases with Ansible Automation Platform MCP Server](https://img.youtube.com/vi/h6VboweM8Ww/maxresdefault.jpg)](https://youtu.be/h6VboweM8Ww?si=65ZZuxwHGjbBtjku)
+
+[Watch on YouTube →](https://youtu.be/h6VboweM8Ww?si=65ZZuxwHGjbBtjku)
+
+## MCP Server Endpoint Toolsets
+
+The AAP MCP server provides these endpoint toolsets:
+
+| Toolset | Endpoint Path | Purpose |
 |---------|--------------|---------|
 | Job Management | `/job_management/mcp` | Jobs, templates, workflows |
 | Inventory Management | `/inventory_management/mcp` | Hosts, groups, inventories |
@@ -120,7 +160,7 @@ AAP provides these MCP server endpoints:
 | Security & Compliance | `/security_compliance/mcp` | Credentials, audit logs |
 | Platform Configuration | `/platform_configuration/mcp` | Settings, configuration |
 
-All endpoints use the same base URL (your AAP server) and port (typically `:8448`).
+All endpoints are served by the same MCP server on your AAP instance (typically on port `:8448`).
 
 ## Troubleshooting
 
@@ -165,7 +205,7 @@ For more details, see [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 ### MCP Servers Not Loading
 
 - Completely quit Cursor (Cmd+Q) and relaunch from terminal
-- Check that all 6 server URLs point to your correct AAP server
+- Check that all 6 toolset endpoint URLs point to your correct AAP server
 - Verify the port (`:8448` is standard for AAP MCP)
 - Check for typos in the endpoint paths
 
@@ -173,10 +213,10 @@ For more details, see [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
 ```
 mcp-demo/
+├── .cursorrules                    # AI context rules for AAP best practices
 ├── .gitignore                      # Ignores sensitive files
 ├── mcp_key.txt                     # Your API token (gitignored)
-├── mcp-config-template.json        # Template for all 6 MCP servers
-├── sean-config-template.json       # Example with real values (gitignored)
+├── mcp-config-template.json        # Template for all 6 MCP toolset endpoints
 ├── KNOWN_ISSUES.md                 # Known compatibility issues
 ├── TOOL_NAME_LIMITS.md             # Tool name length analysis (important!)
 └── README.md                       # This file

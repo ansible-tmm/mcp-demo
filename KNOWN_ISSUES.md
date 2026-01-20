@@ -58,42 +58,6 @@ See [TOOL_NAME_LIMITS.md](TOOL_NAME_LIMITS.md) for detailed analysis and recomme
 - Falls back to SSE transport if needed
 - Works better with AAP's session-based MCP implementation
 
-**Status**: ✅ Working with `streamable-http`
-
-## What's Working
-
-✅ AAP server is accessible
-✅ API token authentication works
-✅ All 6 MCP server endpoints connect successfully
-✅ SSL certificate bypass works with environment variable
-✅ `streamable-http` transport handles AAP's MCP protocol
-✅ Tools are accessible from Cursor AI chat
-
-## Recommendations
-
-### For Best Results:
-
-1. **Use `streamable-http` transport** (not plain `http`)
-2. **Use short server names** (7 chars or less) to avoid tool name length issues
-3. **Set `NODE_TLS_REJECT_UNAUTHORIZED=0`** for self-signed certificates
-4. **Launch Cursor from terminal** to ensure environment variables are loaded
-
-### Example Working Configuration:
-
-```json
-{
-  "mcpServers": {
-    "aap-job": {
-      "type": "streamable-http",
-      "url": "https://172.16.14.100:8448/job_management/mcp",
-      "headers": {
-        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
-      }
-    }
-  }
-}
-```
-
 ## Test Commands
 
 Verify your server setup:
@@ -118,4 +82,4 @@ If you discover additional optimizations or issues, please contribute! This is a
 
 ## Last Updated
 
-January 8, 2026
+January 20, 2026
