@@ -1,0 +1,22 @@
+# Environment files with secrets
+.env
+*.local
+
+# AAP token files
+*token*.txt
+mcp_key.txt
+*.pem
+
+# Node modules (if anyone adds dependencies)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

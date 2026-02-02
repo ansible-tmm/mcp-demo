@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "aap-job-mgmt": {
+      "type": "http",
+      "url": "${AAP_SERVER}/job_management/mcp",
+      "description": "Ansible Automation Platform Job Management",
+      "headers": {
+        "Authorization": "Bearer ${AAP_SERVICE_TOKEN}"
+      },
+      "env": {
+        "AAP_SERVER": "${AAP_SERVER}",
+        "AAP_SERVICE_TOKEN": "${AAP_SERVICE_TOKEN}"
+      }
+    }
+  }
+}

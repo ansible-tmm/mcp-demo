@@ -2,3 +2,8 @@ mcp_key.txt
 .env
 *.pem
 no-priv-mcp-config-template.json
+
+# Local settings and tokens in subdirectories
+**/mcp_key.txt
+**/.env
+**/settings.local.json
