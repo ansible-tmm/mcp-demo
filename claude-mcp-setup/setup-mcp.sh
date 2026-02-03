@@ -1,7 +1,17 @@
 #!/bin/bash
 #
 # Setup script for AAP MCP servers in Claude Code
-# This script adds all 6 AAP MCP toolsets to Claude Code
+#
+# This is a ONE-TIME setup. Once configured, AAP MCP servers will
+# automatically load every time you start Claude Code.
+#
+# This script adds all 6 AAP MCP toolsets:
+#   - aap-job-mgmt      (Job Management)
+#   - aap-inventory     (Inventory Management)
+#   - aap-monitoring    (System Monitoring)
+#   - aap-user-mgmt     (User Management)
+#   - aap-security      (Security & Compliance)
+#   - aap-config        (Platform Configuration)
 #
 # Prerequisites:
 # - Claude Code installed (npm install -g @anthropics/claude-code)
@@ -53,8 +63,12 @@ for i in "${!TOOLSETS[@]}"; do
 done
 
 echo ""
-echo "✓ All ${#TOOLSETS[@]} AAP MCP servers added successfully!"
+echo "✅ Setup complete! All ${#TOOLSETS[@]} AAP MCP servers configured."
 echo ""
-echo "Verify with: claude mcp list"
-echo "To remove: ./remove-mcp.sh"
+echo "These servers will now automatically load every time you start Claude Code."
+echo "No need to run this script again unless you're setting up a new machine"
+echo "or your AAP server URL/token changes."
+echo ""
+echo "Verify installation: claude mcp list"
+echo "To remove all:       ./remove-mcp.sh"
 echo ""

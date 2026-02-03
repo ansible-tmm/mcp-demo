@@ -1,6 +1,7 @@
 # Environment files with secrets
 .env
 *.local
+.aap-credentials
 
 # AAP token files
 *token*.txt
