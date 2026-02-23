@@ -71,6 +71,24 @@ claude mcp list
 # Should show all 6 MCP servers
 ```
 
+### 4. Install Claude Rules File (Recommended)
+
+Copy the rules file so Claude knows how to use the AAP MCP tools effectively:
+
+```bash
+# Create the rules directory if it doesn't exist
+mkdir -p ~/.claude/rules
+
+# Copy the rules file
+cp aap-mcp-tools.md ~/.claude/rules/aap-mcp-tools.md
+```
+
+This teaches Claude to:
+- Always use MCP tools instead of `curl`/API calls for AAP interactions
+- Understand AAP resource relationships (inventories, groups, hosts)
+- Use correct parameter types per MCP server
+- Follow efficient query strategies (e.g., use groups for filtering, not host iteration)
+
 ---
 
 ## What Gets Installed
@@ -366,6 +384,7 @@ Both Claude Code CLI and Cursor can connect to the same AAP MCP servers.
 claude-mcp-setup/
 ├── setup-mcp.sh          # Setup script for all 6 MCP servers
 ├── remove-mcp.sh         # Removal script for all 6 MCP servers
+├── aap-mcp-tools.md      # Claude rules file for AAP MCP tool usage
 ├── .env.example          # Environment variables template
 ├── .gitignore            # Git ignore rules
 └── README.md             # This file
