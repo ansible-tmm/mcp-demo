@@ -45,13 +45,28 @@ Follow the <a href="https://docs.redhat.com/en/documentation/red_hat_ansible_aut
 
 Save your token in `mcp_key.txt` (gitignored for security).
 
-### 2. Set Environment Variables
+### 2. Determine Your MCP Server URL
+
+The URL format for your MCP server depends on how AAP is deployed:
+
+| Deployment Type | URL Format | Example |
+|----------------|------------|---------|
+| **Containerized (RHEL)** | `https://<hostname>:8448/<toolset>/mcp` | `https://aap.example.com:8448/job_management/mcp` |
+| **OpenShift** | `https://<route>/<toolset>/mcp` | `https://aap-mcp.apps.cluster.example.com/job_management/mcp` |
+
+**Containerized deployments** use a hostname (or IP) with port `:8448`. **OpenShift deployments** use an OpenShift Route, which is a fully qualified URL with no port. To find your OpenShift Route, navigate to **Networking → Routes** in the OpenShift console and copy the Location for your MCP server deployment.
+
+> **⚠️ Important**: The `mcp-config-template.json` in this repo uses the containerized format (`hostname:8448`). If you are running AAP on OpenShift, you must replace the URL with your OpenShift Route. See the examples below.
+
+### 3. Set Environment Variables
 
 Add these to your `~/.zshrc` or `~/.bashrc`:
 
+**For containerized (RHEL) deployments:**
+
 ```bash
-# AAP Server hostname or IP
-export AAP_SERVER="your-aap-server.com"
+# AAP MCP Server hostname or IP (with port)
+export AAP_MCP_URL="https://your-aap-server.com:8448"
 
 # AAP API Token
 export MY_SERVICE_TOKEN=$(cat /path/to/mcp-demo/mcp_key.txt)
@@ -60,18 +75,32 @@ export MY_SERVICE_TOKEN=$(cat /path/to/mcp-demo/mcp_key.txt)
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 ```
 
+**For OpenShift deployments:**
+
+```bash
+# AAP MCP Server Route (no port needed)
+export AAP_MCP_URL="https://aap-mcp.apps.cluster.example.com"
+
+# AAP API Token
+export MY_SERVICE_TOKEN=$(cat /path/to/mcp-demo/mcp_key.txt)
+
+# Allow self-signed certificates (only if using self-signed certs)
+export NODE_TLS_REJECT_UNAUTHORIZED=0
+```
+
 Then run: `source ~/.zshrc`
 
 **⚠️ Security Warning**: Only use `NODE_TLS_REJECT_UNAUTHORIZED=0` in development/demo environments.
 
-### 3. Configure MCP in Cursor
+### 4. Configure MCP in Cursor
 
 1. Open **Cursor** → **Settings** → **Cursor Settings** → **Tools & MCP**
 2. Copy content from `mcp-config-template.json`
-3. Paste directly into Cursor's MCP configuration (the template already uses environment variables)
-4. Click **Save**
+3. **If using OpenShift**, replace the URLs to use your Route (no port) instead of `hostname:8448`
+4. Paste directly into Cursor's MCP configuration (the template already uses environment variables)
+5. Click **Save**
 
-**Example Configuration:**
+**Example Configuration (containerized/RHEL with port):**
 
 ```json
 {
@@ -95,9 +124,33 @@ Then run: `source ~/.zshrc`
 }
 ```
 
+**Example Configuration (OpenShift with Route):**
+
+```json
+{
+  "mcpServers": {
+    "aap-mcp-job-management": {
+      "type": "streamable-http",
+      "url": "https://aap-mcp.apps.cluster.example.com/job_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    },
+    "aap-mcp-inventory-management": {
+      "type": "streamable-http",
+      "url": "https://aap-mcp.apps.cluster.example.com/inventory_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:MY_SERVICE_TOKEN}"
+      }
+    }
+    // ... (4 more servers - see mcp-config-template.json)
+  }
+}
+```
+
 **⚠️ Important - Server Name Length**: Some tool names are very long. To avoid the 60-character combined name limit, consider using shorter server names like `aap-job`, `aap-inv`, etc. See [TOOL_NAME_LIMITS.md](TOOL_NAME_LIMITS.md) for details.
 
-### 4. Launch Cursor
+### 5. Launch Cursor
 
 **From terminal** (to ensure environment variables are loaded):
 
@@ -105,7 +158,7 @@ Then run: `source ~/.zshrc`
 open -a Cursor
 ```
 
-### 5. Verify Connection
+### 6. Verify Connection
 
 In Cursor's AI chat, try:
 
@@ -178,7 +231,7 @@ The AAP MCP server provides these endpoint toolsets:
 | Security & Compliance | `/security_compliance/mcp` | Credentials, audit logs |
 | Platform Configuration | `/platform_configuration/mcp` | Settings, configuration |
 
-All endpoints are served by the same MCP server on your AAP instance (typically on port `:8448`).
+All endpoints are served by the same MCP server on your AAP instance. For containerized (RHEL) deployments, this is typically on port `:8448`. For OpenShift deployments, endpoints are accessed through the OpenShift Route (no port required).
 
 ## Troubleshooting
 
@@ -214,9 +267,17 @@ For more details, see [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 1. **Verify AAP MCP server is running** on your AAP instance
 2. **Check API token** is valid and has correct permissions
 3. **Test endpoint manually**:
+
+   Containerized (RHEL):
    ```bash
    curl -k -H "Authorization: Bearer YOUR_TOKEN" \
      https://your-aap-server.com:8448/job_management/mcp
+   ```
+
+   OpenShift:
+   ```bash
+   curl -k -H "Authorization: Bearer YOUR_TOKEN" \
+     https://aap-mcp.apps.cluster.example.com/job_management/mcp
    ```
 4. **Check Cursor logs**: `~/Library/Application Support/Cursor/logs/`
 
@@ -224,7 +285,8 @@ For more details, see [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
 - Completely quit Cursor (Cmd+Q) and relaunch from terminal
 - Check that all 6 toolset endpoint URLs point to your correct AAP server
-- Verify the port (`:8448` is standard for AAP MCP)
+- **Containerized**: Verify the port (`:8448` is standard for AAP MCP on RHEL)
+- **OpenShift**: Verify you are using the Route URL (no port) — find it under **Networking → Routes** in the OpenShift console
 - Check for typos in the endpoint paths
 
 ## File Structure
